@@ -3,13 +3,18 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"strings"
 )
 
 func main() {
-	fmt.Println("Welcome to TCP-Chat!")
+	file, err := os.ReadFile("welcome.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(file))
 	if len(os.Args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <host> <port>\n", os.Args[0])
 		os.Exit(1)
@@ -48,6 +53,11 @@ func handleOutgoingMessages(conn net.Conn) {
 		fmt.Print("> ")
 		msg, _ := consoleReader.ReadString('\n')
 		msg = strings.TrimSpace(msg)
+
+		if msg == "" {
+			fmt.Println("Vous ne pouvez pas envoyer un message vide")
+			continue
+		}
 
 		if msg == "exit" {
 			return

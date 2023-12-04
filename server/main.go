@@ -87,26 +87,25 @@ func handleConn(conn net.Conn) {
 		return
 	}
 
-	ch <- "Welcome to the chat, " + who
 	for _, msg := range messageHistory {
 		ch <- msg
 	}
 
-	messages <- fmt.Sprintf("[%s][%s] has arrived", time.Now().Format("2023-12-01 15:05:04"), who)
+	messages <- fmt.Sprintf("%s has arrived...", who)
 	entering <- Client{who, ch}
 
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
 		text := input.Text()
 		if text != "" {
-			msg := fmt.Sprintf("[%s][%s]: %s", time.Now().Format("2023-12-01 15:05:04"), who, text)
+			msg := fmt.Sprintf("[%s][%s]: %s", time.Now().Format("2006-01-02 15:04:05"), who, text)
 			messages <- msg
 			messageHistory = append(messageHistory, msg)
 		}
 	}
 
 	leaving <- Client{who, ch}
-	messages <- fmt.Sprintf("[%s][%s] has left", time.Now().Format("2023-12-01 15:05:04"), who)
+	messages <- fmt.Sprintf("%s has left...", who)
 	conn.Close()
 	clientCount--
 }
@@ -118,7 +117,7 @@ func clientWriter(conn net.Conn, ch <-chan string) {
 }
 
 func getClientName(conn net.Conn) string {
-	fmt.Fprintln(conn, "Enter your name :")
+	fmt.Fprintln(conn, "[ENTER YOUR NAME] :")
 	nameScanner := bufio.NewScanner(conn)
 
 	if nameScanner.Scan() {
